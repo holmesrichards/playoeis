@@ -29,6 +29,10 @@ args are:
 --rest xx        Interpret data values as rests: xx = n negatives, z zeros, 
                  p positives, nz nonnegatives, etc.
 --verbose        Print diagnostics
+
+Author: Rich Holmes
+Repo: https://github.com/holmesrichards/playoeis
+License: Creative Commons Zero v1.0 Universal
 """
 
 import mido
