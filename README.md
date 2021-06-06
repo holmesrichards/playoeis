@@ -24,7 +24,7 @@ args are:
 * --poff n         Notes are offset by n (default 24)
                  (Note results of modulo and offset are then reduced modulo 128)
 * --rest xx        Interpret data values as rests: xx = n negatives, z zeros, 
-                 p positives, nz nonnegatives, etc.
+                 p positives, nz nonpositives, etc.
 * --verbose        Print diagnostics
 
 Uses libraries: mido, oeispy, requests, re, sys
