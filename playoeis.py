@@ -21,6 +21,8 @@ args are:
                  first result returned, ignore entry if given
 --iport string   Use input port with this name, else use system default
 --oport string   Use output port with this name, else use system default
+--nstep n        In --loop mode reset loop index every n steps. In --noloop
+                 mode play maximum of n steps. Default is length of data file.
 --pmod n         OEIS entries are reduced modulo n (default 88)
 --poff n         Notes are offset by n (default 0)
                  (Note results of modulo and offset are then reduced modulo 128)
@@ -35,7 +37,7 @@ import requests
 import re
 from sys import argv
 
-def playdata (dataa, pmod=88, poff=0, loop=False, inportname="", outportname="", rest=""):
+def playdata (dataa, pmod=88, poff=0, loop=False, inportname="", outportname="", nstep="999", rest=""):
     """Play the data in the list dataa.
     Note played is list entry mod pmod offset by poff.
     These notes are substituted for notes coming from input port
@@ -44,7 +46,8 @@ def playdata (dataa, pmod=88, poff=0, loop=False, inportname="", outportname="",
     sent, and then noteon with dataa value. When a noteoff is seen,
     noteoffs for any on notes are sent. This seems the best way to handle
     multiple input notes mapping to same output note.)
-    If loop is True, loop forever until terminated.
+    If loop is True, loop forever until terminated; reset loop index every 
+    nstep steps. If loop is False, play up to n steps and return.
     If rest contains n, p, and/or z, then negative, positive, and/or zero
     data values are interpreted as rests.
     """
@@ -59,8 +62,11 @@ def playdata (dataa, pmod=88, poff=0, loop=False, inportname="", outportname="",
         outport = mido.open_output(outportname)
 
     index = 0
+    if not loop and nstep > len(dataa):
+        nstep = len(dataa)
         
     noteson = {}
+    nnn = 0
     try:
         for msg in inport:
             if msg.type == 'note_on':
@@ -74,11 +80,18 @@ def playdata (dataa, pmod=88, poff=0, loop=False, inportname="", outportname="",
                     nn = (dataa[index]%pmod+poff)%128
                     outport.send (msg.copy(note=nn))
                     noteson[n] = nn
-                if index == len(dataa)-1:
+
+                if nnn == nstep-1:
                     if loop:
-                        index = 0
+                        index = len(dataa)-1
+                        nnn = 0
                     else:
                         break
+                else:
+                    nnn += 1
+
+                if index == len(dataa)-1:
+                    index = 0
                 else:
                     index += 1                    
             elif msg.type == 'note_off':
@@ -103,6 +116,7 @@ def main():
     vinportname = ""
     voutportname = ""
     vrest = ""
+    vnstep = 0
     vpmod = 88
     vpoff = 24
     verbose = False
@@ -122,6 +136,9 @@ def main():
             elif argv[i] == '--oport':
                 i += 1
                 voutportname = argv[i]
+            elif argv[i] == '--nstep':
+                i += 1
+                vnstep = int(argv[i])
             elif argv[i] == '--pmod':
                 i += 1
                 vpmod = int(argv[i])
@@ -179,11 +196,15 @@ def main():
 
     if verbose:
         print ("Data starts with", dataa[0:10])
-            
+
+    if vnstep == 0:
+        vnstep = len(dataa)
+        
     playdata (dataa,
               loop=vloop,
               inportname=vinportname,
               outportname=voutportname,
+              nstep=vnstep,
               pmod=vpmod,
               poff=vpoff,
               rest=vrest)
