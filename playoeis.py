@@ -190,6 +190,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-#'Arturia KeyStep 32:Arturia KeyStep 32 MIDI 1 16:0'
-#'2600 Gray Meanie:2600 Gray Meanie MIDI 1 32:0'
