@@ -19,6 +19,7 @@ args are:
 * --search string  Search OEIS with the given string as search term and use first result returned, ignore entry if given
 * --iport string   Use input port with this name, else use system default
 * --oport string   Use output port with this name, else use system default
+* --nstep n        In --loop mode reset loop index every n steps. In --noloop mode play maximum of n steps. Default is length of data file.
 * --pmod n         OEIS entries are reduced modulo n (default 88)
 * --poff n         Notes are offset by n (default 24)
                  (Note results of modulo and offset are then reduced modulo 128)
