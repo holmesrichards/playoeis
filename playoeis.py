@@ -36,12 +36,12 @@ License: Creative Commons Zero v1.0 Universal
 """
 
 import mido
-import oeispy as op
+import oeislib as op  # this is my fork of oeispy
 import requests
 import re
 from sys import argv
 
-def playdata (dataa, pmod=88, poff=0, loop=False, inportname="", outportname="", nstep="999", rest=""):
+def playdata (dataa, pmod=88, poff=0, loop=False, inportname="", outportname="", nstep="0", rest=""):
     """Play the data in the list dataa.
     Note played is list entry mod pmod offset by poff.
     These notes are substituted for notes coming from input port
@@ -51,7 +51,7 @@ def playdata (dataa, pmod=88, poff=0, loop=False, inportname="", outportname="",
     noteoffs for any on notes are sent. This seems the best way to handle
     multiple input notes mapping to same output note.)
     If loop is True, loop forever until terminated; reset loop index every 
-    nstep steps. If loop is False, play up to n steps and return.
+    nstep steps if nstep>0, or end of . If loop is False (and nstep>0), play up to nstep steps and return.
     If rest contains n, p, and/or z, then negative, positive, and/or zero
     data values are interpreted as rests.
     """
@@ -173,7 +173,7 @@ def main():
     try:
         if verbose:
             print ("Search for:", sstring)
-        res = op.resultEois(sstring)
+        res = op.resultOeis(sstring)
     except:
         print ("Search failed for", sstring)
         return
@@ -183,27 +183,21 @@ def main():
         for r in res:
             print ("A{:06d}".format(op.getNumber(r)), op.getName(r))
 
-    no = op.getNumber(res[0])
-    url = 'https://oeis.org/A{:06d}/b{:06d}.txt'.format (no, no)
-    try:
-        if verbose:
-            print ("Getting data from", url)
-        data = requests.get(url).text
-    except:
-        print ("Failed to get", url)
-        return
-
-    dataa = []
-    for line in data.splitlines():
-        if line and not re.match('#', line):
-            dataa.append(int(line.split()[1]))
-
-    if verbose:
-        print ("Data starts with", dataa[0:10])
+    datagen = op.getBfileData(res[0])
 
     if vnstep == 0:
-        vnstep = len(dataa)
-        
+        dataa = [d[1] for d in datagen]
+    else:
+        dataa = []
+        for i in range(vnstep):
+            try:
+                dataa.append (next(datagen)[1])
+            except StopIteration:
+                pass
+
+    if verbose:
+        print ("Data starts with", dataa[0:min(10,len(dataa))])
+            
     playdata (dataa,
               loop=vloop,
               inportname=vinportname,

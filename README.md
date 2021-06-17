@@ -27,4 +27,4 @@ args are:
                  p positives, nz nonpositives, etc.
 * --verbose        Print diagnostics
 
-Uses libraries: mido, oeispy, requests, re, sys
+Uses libraries: mido, requests, re, sys (standard libraries or from PyPi); oeislib (from [https://github.com/holmesrichards/oeislib](https://github.com/holmesrichards/oeislib]).)
