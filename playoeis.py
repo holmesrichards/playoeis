@@ -42,18 +42,20 @@ import re
 from sys import argv
 
 def playdata (dataa, pmod=88, poff=0, loop=False, inportname="", outportname="", nstep="0", rest=""):
-    """Play the data in the list dataa.
-    Note played is list entry mod pmod offset by poff.
-    These notes are substituted for notes coming from input port
-    named inportname, and are sent to output port named outportname.
-    (Specifically, when a noteon is seen, noteoffs for any on notes are
-    sent, and then noteon with dataa value. When a noteoff is seen,
-    noteoffs for any on notes are sent. This seems the best way to handle
-    multiple input notes mapping to same output note.)
-    If loop is True, loop forever until terminated; reset loop index every 
-    nstep steps if nstep>0, or end of . If loop is False (and nstep>0), play up to nstep steps and return.
-    If rest contains n, p, and/or z, then negative, positive, and/or zero
-    data values are interpreted as rests.
+    """Play the data in the list dataa.  Note played is list entry mod
+    pmod offset by poff.  These notes are substituted for notes coming
+    from input port named inportname, and are sent to output port
+    named outportname.  (Specifically, when a noteon is seen, noteoffs
+    for any on notes are sent, and then noteon with dataa value. When
+    a noteoff is seen, noteoffs for any on notes are sent. This seems
+    the best way to handle multiple input notes mapping to same output
+    note.)  If loop is True, loop forever until terminated; reset loop
+    index every nstep steps if nstep>0, or end of dataa if
+    nstep==0. If loop is False, play up to nstep steps (or all steps
+    in dataa, if nstep==0) and return.  If rest contains n, p, and/or
+    z, then negative, positive, and/or zero data values are
+    interpreted as rests.
+
     """
     
     if inportname=="":
